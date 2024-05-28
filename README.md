@@ -1,2 +1,1 @@
 # databricks-gold-pipeline
-
