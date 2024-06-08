@@ -1,0 +1,16 @@
+{
+   "job_cluster_key": "automated_cluster_dock",
+   "new_cluster": {
+       "spark_version": "14.3.x-scala2.12",
+       "aws_attributes": {
+           "first_on_demand": 1,
+           "availability": "SPOT_WITH_FALLBACK",
+           "zone_id": "us-east-1a",
+           "instance_profile_arn": "arn:aws:iam::944360682019:instance-profile/DatabricksGlue",
+           "spot_bid_price_percent": 100,
+           "ebs_volume_count": 0
+       },
+       "node_type_id": "c6gd.2xlarge",
+       "num_workers": 2
+   }
+}
