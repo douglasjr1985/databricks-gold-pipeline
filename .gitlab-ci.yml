@@ -1,0 +1,33 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  PYTHON_VERSION: "3.12.0"
+
+default:
+  image: ubuntu:22.04
+  before_script:
+    - apt-get update && apt-get install -y make python3-pip
+    - python3 -m pip install --upgrade pip
+
+build:
+  stage: build
+  script:
+    - make install
+  only:
+    refs:
+      - main
+      - master
+
+deploy:
+  stage: deploy
+  script:
+    - make deploy DATALAKE_DATABRICKS_WORKSPACE_URL_PRD=${DATALAKE_DATABRICKS_WORKSPACE_URL_PRD} DATALAKE_DATABRICKS_CLIENT_SECRET=${DATALAKE_DATABRICKS_CLIENT_SECRET}
+  only:
+    refs:
+      - main
+      - master
+  variables:
+    DATALAKE_DATABRICKS_WORKSPACE_URL_PRD: $DATALAKE_DATABRICKS_WORKSPACE_URL_PRD
+    DATALAKE_DATABRICKS_CLIENT_SECRET: $DATALAKE_DATABRICKS_CLIENT_SECRET
