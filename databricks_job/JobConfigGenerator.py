@@ -48,9 +48,14 @@ class JobConfigGenerator:
             "description": f"Python task for {task_name}",
             "job_cluster_key": "automated_cluster_dock",
             "spark_python_task": {
-                "python_file": "projects/executor.py",
+                "python_file": "models/executor.py",
                 "source": "GIT",
-                "parameters": [base_parameters['sql_query']]
+                "parameters": [
+                    base_parameters['sql_query'],
+                    base_parameters['database'],
+                    base_parameters['table_name'],
+                    base_parameters['mode']
+                ]
             },
             "libraries": [],
             "timeout_seconds": 3600,
@@ -58,5 +63,3 @@ class JobConfigGenerator:
             "min_retry_interval_millis": 1000,
             "retry_on_timeout": False
         }
-
- 
