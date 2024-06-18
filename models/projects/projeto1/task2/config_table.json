@@ -1,0 +1,5 @@
+{
+    "database": "gold",
+    "table_name": "my_table",
+    "mode": "append"
+}

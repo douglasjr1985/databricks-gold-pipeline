@@ -2,7 +2,6 @@ import argparse
 import os
 import json
 import requests
-from loguru import logger
 from configure_logging import LoggingConfigurator
 from databricks_job.DatabricksAPI import DatabricksAPI
 from databricks_job.JobConfigGenerator import JobConfigGenerator
@@ -46,16 +45,6 @@ def load_query(task_path):
         raise FileNotFoundError(f"Query file not found in task: {task_path}")
 
 
-def load_config(task_path):
-    """Loads table config from the task directory."""
-    config_path = os.path.join(task_path, 'config_table.json')
-    if os.path.exists(config_path):
-        with open(config_path, 'r') as f:
-            return json.load(f)
-    else:
-        raise FileNotFoundError(f"Config file not found in task: {task_path}")
-
-
 def main():
     args = parse_arguments()
     databricks_token = args.client_secret
@@ -63,57 +52,41 @@ def main():
     projects_dir = args.projects_dir
 
     api = DatabricksAPI(databricks_token, databricks_instance)
-    executor_script_path = '/Workspace/models/executor.py'  # Path to the executor script in Databricks
 
     # Iterate over each project in the projects directory
     for project_name in os.listdir(projects_dir):
         project_path = os.path.join(projects_dir, project_name)
-        if os.path.isdir(project_path) and project_name != 'models':
+        if os.path.isdir(project_path) and project_name != 'executor.py':
             tasks = []
-            logger.info(f"Processing project: {project_name}")
+            print(f"Processing project: {project_name}")
             for task_name in os.listdir(project_path):
                 task_path = os.path.join(project_path, task_name)
                 if os.path.isdir(task_path):
-                    logger.info(f"Processing task: {task_name} in project: {project_name}")
+                    print(f"Processing task: {task_name} in project: {project_name}")
                     # Load SQL query from the task directory
                     try:
                         sql_query = load_query(task_path)
-                        logger.info(f"Loaded query for task {task_name}: {sql_query}")
+                        print(f"Loaded query for task {task_name}: {sql_query}")
                     except FileNotFoundError as e:
-                        logger.error(e)
+                        print(e)
                         continue
 
-                    # Load table config
-                    try:
-                        config = load_config(task_path)
-                        logger.info(f"Loaded config for task {task_name}: {config}")
-                    except FileNotFoundError as e:
-                        logger.error(e)
-                        continue
-
-                    # Load job config to get the job_cluster_key
-                    try:
-                        job_cluster_config = load_job_config(project_path)
-                        job_cluster_key = job_cluster_config["job_cluster_key"]
-                    except FileNotFoundError as e:
-                        logger.error(e)
-                        continue
-
-                    # Generate a task to execute the SQL query using the Python script
+                    # Generate a task to execute the SQL query using a Python script
                     python_task = JobConfigGenerator.generate_python_task(
                         task_name,
-                        base_parameters={
-                            "sql_query": sql_query,
-                            "database": config["database"],
-                            "table_name": config["table_name"],
-                            "mode": config["mode"]
-                        }
+                        base_parameters={"sql_query": sql_query}
                     )
                     tasks.append(python_task)
-                    logger.info(f"Task {task_name} added to project {project_name}")
+                    print(f"Task {task_name} added to project {project_name}")
 
             if not tasks:
-                logger.warning(f"No tasks found for project {project_name}")
+                print(f"No tasks found for project {project_name}")
+
+            try:
+                job_cluster_config = load_job_config(project_path)
+            except FileNotFoundError as e:
+                print(e)
+                continue
 
             job_config = {
                 "name": project_name,
@@ -132,7 +105,7 @@ def main():
             }
 
             # Log to verify job_config
-            logger.info(f"Job config for project {project_name}: {json.dumps(job_config, indent=4)}")
+            print(f"Job config for project {project_name}: {json.dumps(job_config, indent=4)}")
 
             try:
                 job_id = api.find_job_by_name(project_name)
@@ -140,9 +113,9 @@ def main():
                     response = api.update_job(job_id, job_config)
                 else:
                     response = api.create_job(job_config)
-                logger.info(f"Job processed successfully for project {project_name}: {response}")
+                print(f"Job processed successfully for project {project_name}: {response}")
             except requests.exceptions.HTTPError as e:
-                logger.error(f"Failed to process job for project {project_name}: {e.response.text}")
+                print(f"Failed to process job for project {project_name}: {e.response.text}")
 
 
 if __name__ == "__main__":
