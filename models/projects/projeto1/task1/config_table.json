@@ -1,5 +1,5 @@
 {
-     "database": "gold",
-     "table_name": "my_table",
+     "database": "app_observability",
+     "table_name": "tabela_gold",
      "mode": "append"
  }
