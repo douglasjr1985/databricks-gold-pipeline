@@ -7,7 +7,6 @@ from configure_logging import LoggingConfigurator
 from databricks_job.DatabricksAPI import DatabricksAPI
 from databricks_job.JobConfigGenerator import JobConfigGenerator
 
-
 def parse_arguments():
     """Parses command-line arguments."""
     parser = argparse.ArgumentParser(description='Process modified Jobs.')
@@ -16,7 +15,6 @@ def parse_arguments():
     parser.add_argument('--projects_dir', type=str, required=True, help='Directory containing project folders')
     return parser.parse_args()
 
-
 def list_tasks(directory):
     """Lists task directories in the specified directory."""
     task_directories = []
@@ -24,7 +22,6 @@ def list_tasks(directory):
         for dir in dirs:
             task_directories.append(os.path.join(root, dir))
     return task_directories
-
 
 def load_job_config(project_path):
     """Loads job configuration from the project directory."""
@@ -35,7 +32,6 @@ def load_job_config(project_path):
     else:
         raise FileNotFoundError(f"Configuration file not found in project: {project_path}")
 
-
 def load_query(task_path):
     """Loads SQL query from the task directory."""
     query_path = os.path.join(task_path, 'query.sql')
@@ -45,7 +41,6 @@ def load_query(task_path):
     else:
         raise FileNotFoundError(f"Query file not found in task: {task_path}")
 
-
 def load_config(task_path):
     """Loads table config from the task directory."""
     config_path = os.path.join(task_path, 'config_table.json')
@@ -54,7 +49,6 @@ def load_config(task_path):
             return json.load(f)
     else:
         raise FileNotFoundError(f"Config file not found in task: {task_path}")
-
 
 def main():
     args = parse_arguments()
@@ -143,7 +137,6 @@ def main():
                 logger.info(f"Job processed successfully for project {project_name}: {response}")
             except requests.exceptions.HTTPError as e:
                 logger.error(f"Failed to process job for project {project_name}: {e.response.text}")
-
 
 if __name__ == "__main__":
     main()
