@@ -94,15 +94,16 @@ def main():
                         continue
 
                     # Generate a task to execute the SQL query using the Python script
-                    python_task = JobConfigGenerator.generate_python_task(
-                        task_name,
-                        base_parameters={
-                            "sql_query": sql_query,
-                            "database": config["database"],
-                            "table_name": config["table_name"],
-                            "mode": config.get("mode", "append")  # Default para append se não especificado
-                        }
-                    )
+                    base_parameters = {
+                        "sql_query": sql_query,
+                        "database": config["database"],
+                        "table_name": config["table_name"],
+                        "mode": config.get("mode", "append")  # Default para append se não especificado
+                    }
+                    if 'primary_key' in config:
+                        base_parameters["primary_key"] = config["primary_key"]
+
+                    python_task = JobConfigGenerator.generate_python_task(task_name, base_parameters)
                     tasks.append(python_task)
                     logger.info(f"Task {task_name} added to project {project_name}")
 

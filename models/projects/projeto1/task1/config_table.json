@@ -1,5 +1,6 @@
 {
      "database": "app_observability",
      "table_name": "tabela_gold",
-     "mode": "append"
+     "mode": "append",
+     "primary_key":"id_table"
  }

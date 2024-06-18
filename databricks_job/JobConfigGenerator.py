@@ -43,6 +43,16 @@ class JobConfigGenerator:
     @staticmethod
     def generate_python_task(task_name, base_parameters):
         """Generates a Databricks Python task configuration."""
+        parameters = [
+            f"--sql_query={base_parameters['sql_query']}",
+            f"--database={base_parameters['database']}",
+            f"--table_name={base_parameters['table_name']}",
+            f"--mode={base_parameters['mode']}"
+        ]
+        
+        if 'primary_key' in base_parameters:
+            parameters.append(f"--primary_key={base_parameters['primary_key']}")
+
         return {
             "task_key": task_name,
             "description": f"Python task for {task_name}",
@@ -50,12 +60,7 @@ class JobConfigGenerator:
             "spark_python_task": {
                 "python_file": "models/executor.py",
                 "source": "GIT",
-                "parameters": [
-                    f"--sql_query={base_parameters['sql_query']}",
-                    f"--database={base_parameters['database']}",
-                    f"--table_name={base_parameters['table_name']}",
-                    f"--mode={base_parameters['mode']}"
-                ]
+                "parameters": parameters
             },
             "libraries": [],
             "timeout_seconds": 3600,
