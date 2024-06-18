@@ -56,24 +56,31 @@ def main():
     # Iterate over each project in the projects directory
     for project_name in os.listdir(projects_dir):
         project_path = os.path.join(projects_dir, project_name)
-        if os.path.isdir(project_path):
+        if os.path.isdir(project_path) and project_name != 'executor.py':
             tasks = []
-            for task_path in list_tasks(project_path):
+            print(f"Processing project: {project_name}")
+            for task_name in os.listdir(project_path):
+                task_path = os.path.join(project_path, task_name)
                 if os.path.isdir(task_path):
+                    print(f"Processing task: {task_name} in project: {project_name}")
                     # Load SQL query from the task directory
                     try:
                         sql_query = load_query(task_path)
+                        print(f"Loaded query for task {task_name}: {sql_query}")
                     except FileNotFoundError as e:
                         print(e)
                         continue
 
-                    # Generate a task to execute the SQL query using a notebook
-                    notebook_task = JobConfigGenerator.generate_notebook_task(
-                        os.path.basename(task_path),
-                        "/Workspace/Path/To/Your/SQLExecutorNotebook",
+                    # Generate a task to execute the SQL query using a Python script
+                    python_task = JobConfigGenerator.generate_python_task(
+                        task_name,
                         base_parameters={"sql_query": sql_query}
                     )
-                    tasks.append(notebook_task)
+                    tasks.append(python_task)
+                    print(f"Task {task_name} added to project {project_name}")
+
+            if not tasks:
+                print(f"No tasks found for project {project_name}")
 
             try:
                 job_cluster_config = load_job_config(project_path)
@@ -89,7 +96,12 @@ def main():
                     "git_provider": "gitHub",
                     "git_branch": "main"
                 },
-                "job_clusters": [job_cluster_config]
+                "job_clusters": [
+                    {
+                        "job_cluster_key": job_cluster_config["job_cluster_key"],
+                        "new_cluster": job_cluster_config["new_cluster"]
+                    }
+                ]
             }
 
             # Log to verify job_config
