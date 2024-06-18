@@ -63,7 +63,7 @@ def main():
     projects_dir = args.projects_dir
 
     api = DatabricksAPI(databricks_token, databricks_instance)
-    executor_script_path = '/Workspace/models/executor.py'  # Path to the executor script in Databricks
+    executor_script_path = 'dbfs:/path/to/executor.py'  # Path to the executor script in DBFS
 
     # Iterate over each project in the projects directory
     for project_name in os.listdir(projects_dir):
