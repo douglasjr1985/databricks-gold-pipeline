@@ -106,7 +106,7 @@ def main():
                             "sql_query": sql_query,
                             "database": config["database"],
                             "table_name": config["table_name"],
-                            "mode": config["mode"]
+                            "mode": config.get("mode", "append")  # Default para append se não especificado
                         }
                     )
                     tasks.append(python_task)
