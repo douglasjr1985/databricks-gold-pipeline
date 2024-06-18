@@ -1,33 +1,40 @@
-import sys
-import json
+import argparse
+from loguru import logger
 from pyspark.sql import SparkSession
 
-# Pega a query SQL e o caminho da configuração passados como argumentos
-sql_query = sys.argv[1]
-config_path = sys.argv[2]
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Execute a SQL query and save the result to a table.')
+    parser.add_argument('--sql_query', type=str, required=True, help='SQL query to execute')
+    parser.add_argument('--database', type=str, required=True, help='Database name')
+    parser.add_argument('--table_name', type=str, required=True, help='Table name')
+    parser.add_argument('--mode', type=str, default='append', help='Save mode (default: append)')
+    return parser.parse_args()
 
-# Log da consulta SQL e do caminho da configuração recebidos
-print(f"Executing SQL query: {sql_query}")
-print(f"Loading config from: {config_path}")
+def main():
+    args = parse_arguments()
 
-# Executa a consulta SQL
-spark = SparkSession.builder.appName("SQLExecutor").getOrCreate()
-result = spark.sql(sql_query)
+    sql_query = args.sql_query
+    database = args.database
+    table_name = args.table_name
+    mode = args.mode
 
-# Mostra o resultado
-result.show()
+    # Log the received parameters
+    logger.info(f"Executing SQL query: {sql_query}")
+    logger.info(f"Saving to database: {database}, table: {table_name}, mode: {mode}")
 
-# Carrega as configurações de escrita
-with open(config_path, 'r') as f:
-    config = json.load(f)
+    # Execute the SQL query
+    spark = SparkSession.builder.appName("SQLExecutor").getOrCreate()
+    result = spark.sql(sql_query)
 
-database = config.get("database")
-table_name = config.get("table_name")
-mode = config.get("mode", "append")  # Default para append se não especificado
+    # Show the result
+    result.show()
 
-# Constrói o nome completo da tabela
-full_table_name = f"{database}.{table_name}"
+    # Construct the full table name
+    full_table_name = f"{database}.{table_name}"
 
-# Salva a tabela conforme as configurações
-result.write.mode(mode).saveAsTable(full_table_name)
-print(f"Table {full_table_name} saved with mode {mode}")
+    # Save the table according to the configurations
+    result.write.mode(mode).saveAsTable(full_table_name)
+    logger.info(f"Table {full_table_name} saved with mode {mode}")
+
+if __name__ == "__main__":
+    main()
