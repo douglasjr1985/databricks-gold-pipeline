@@ -13,28 +13,30 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
-    sql_query = args.sql_query
-    database = args.database
-    table_name = args.table_name
-    mode = args.mode
+    print(args)
 
-    # Log the received parameters
-    logger.info(f"Executing SQL query: {sql_query}")
-    logger.info(f"Saving to database: {database}, table: {table_name}, mode: {mode}")
+    # sql_query = args.sql_query
+    # database = args.database
+    # table_name = args.table_name
+    # mode = args.mode
 
-    # Execute the SQL query
-    spark = SparkSession.builder.appName("SQLExecutor").getOrCreate()
-    result = spark.sql(sql_query)
+    # # Log the received parameters
+    # logger.info(f"Executing SQL query: {sql_query}")
+    # logger.info(f"Saving to database: {database}, table: {table_name}, mode: {mode}")
 
-    # Show the result
-    result.show()
+    # # Execute the SQL query
+    # spark = SparkSession.builder.appName("SQLExecutor").getOrCreate()
+    # result = spark.sql(sql_query)
 
-    # Construct the full table name
-    full_table_name = f"{database}.{table_name}"
+    # # Show the result
+    # result.show()
 
-    # Save the table according to the configurations
-    result.write.mode(mode).saveAsTable(full_table_name)
-    logger.info(f"Table {full_table_name} saved with mode {mode}")
+    # # Construct the full table name
+    # full_table_name = f"{database}.{table_name}"
+
+    # # Save the table according to the configurations
+    # result.write.mode(mode).saveAsTable(full_table_name)
+    # logger.info(f"Table {full_table_name} saved with mode {mode}")
 
 if __name__ == "__main__":
     main()
