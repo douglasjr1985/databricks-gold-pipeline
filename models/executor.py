@@ -1,6 +1,6 @@
 import argparse
 from loguru import logger
-from pyspark.sql import SparkSession
+#from pyspark.sql import SparkSession
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Execute a SQL query and save the result to a table.')
@@ -15,10 +15,10 @@ def main():
 
     print(args)
 
-    # sql_query = args.sql_query
-    # database = args.database
-    # table_name = args.table_name
-    # mode = args.mode
+    sql_query = args.sql_query
+    database = args.database
+    table_name = args.table_name
+    mode = args.mode
 
     # # Log the received parameters
     # logger.info(f"Executing SQL query: {sql_query}")
