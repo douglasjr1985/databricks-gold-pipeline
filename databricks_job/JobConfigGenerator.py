@@ -51,10 +51,10 @@ class JobConfigGenerator:
                 "python_file": "models/executor.py",
                 "source": "GIT",
                 "parameters": [
-                    base_parameters['sql_query'],
-                    base_parameters['database'],
-                    base_parameters['table_name'],
-                    base_parameters['mode']
+                    f"--sql_query={base_parameters['sql_query']}",
+                    f"--database={base_parameters['database']}",
+                    f"--table_name={base_parameters['table_name']}",
+                    f"--mode={base_parameters['mode']}"
                 ]
             },
             "libraries": [],
